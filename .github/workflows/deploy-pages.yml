@@ -1,0 +1,70 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Allow the workflow to publish a Pages site and request the
+# OIDC token that ``actions/deploy-pages`` exchanges for the
+# deployment credential.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one in-flight deploy at a time; do not cancel a running
+# deploy so half-uploaded artifacts cannot leave the site broken.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build static export
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build static export
+        # next.config.js sets ``output: 'export'`` so ``next build``
+        # writes the full static site to ``out/``. ``public/CNAME``
+        # is copied through automatically and pins the apex domain
+        # (opennuts.com) on the Pages deployment.
+        run: npm run build
+
+      - name: Make the export GitHub-Pages friendly
+        # Disable Jekyll so files / dirs prefixed with ``_`` (Next
+        # ships ``_next/``) are served as-is rather than swallowed
+        # by Jekyll's "underscore = private" convention.
+        run: touch out/.nojekyll
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload static artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    name: Deploy to Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
