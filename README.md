@@ -1,35 +1,33 @@
-# Pocket
+# opennuts-web
 
-Pocket is a [Tailwind Plus](https://tailwindcss.com/plus) site template built using [Tailwind CSS](https://tailwindcss.com) and [Next.js](https://nextjs.org).
+The marketing site for [OpenNuts](https://opennuts.com) — nothing more, nothing less.
 
-## Getting started
+It is a small Next.js app that is statically exported and published to GitHub Pages.
 
-To get started with this template, first install the npm dependencies:
+OpenNuts is a product of [JD Brinton Consulting, Inc.](https://jdbrinton.consulting).
+
+## Deployment
+
+Every push to `main` triggers `.github/workflows/deploy-pages.yml`, which runs `next build` (with `output: 'export'`) and ships the resulting `out/` directory to GitHub Pages. The apex domain `opennuts.com` is pinned via `public/CNAME`. There is no manual deploy step.
+
+## Local development
+
+If you want to run the site locally — to preview a change, debug a layout, or work on copy — clone the repo and:
 
 ```bash
 npm install
-```
-
-Next, run the development server:
-
-```bash
 npm run dev
 ```
 
-Finally, open [http://localhost:3000](http://localhost:3000) in your browser to view the website.
+Then open <http://localhost:3000>.
 
-## Customizing
+To reproduce exactly what gets deployed, build the static export and serve it:
 
-You can start editing this template by modifying the files in the `/src` folder. The site will auto-update as you edit these files.
+```bash
+npm run build
+npm run serve
+```
 
 ## License
 
-This site template is a commercial product and is licensed under the [Tailwind Plus license](https://tailwindcss.com/plus/license).
-
-## Learn more
-
-To learn more about the technologies used in this site template, see the following resources:
-
-- [Tailwind CSS](https://tailwindcss.com/docs) - the official Tailwind CSS documentation
-- [Next.js](https://nextjs.org/docs) - the official Next.js documentation
-- [Headless UI](https://headlessui.dev) - the official Headless UI documentation
+Source is released under the [GNU Affero General Public License v3.0](./LICENSE.md).
